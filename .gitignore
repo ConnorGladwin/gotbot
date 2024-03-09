@@ -1,6 +1,7 @@
 backend/.air.toml
 backend/go.mod
 backend/tmp
+backend/.env
 
 frontend/node_modules
 frontend/dist
