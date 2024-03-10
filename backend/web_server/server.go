@@ -2,19 +2,21 @@ package server
 
 import (
 	"database/sql"
-	"strings"
-	// "encoding/json"
+	// "fmt"
 	"log"
 	"net/http"
 
-	// "net/url"
-
 	"github.com/gin-gonic/gin"
 
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
+
 	// "gotbot/backend/web_server/auth"
+	"gotbot/backend/web_server/auth"
 	"gotbot/backend/web_server/database"
 	"gotbot/backend/web_server/queries"
-  // "gotbot/backend/web_server/auth"
 )
 
 type Data struct {
@@ -22,22 +24,33 @@ type Data struct {
 }
 
 func Start() {
+  err := godotenv.Load()
+
+  if err != nil {
+    log.Fatal("Error loading .env file")
+  }
+
   r := gin.Default() 
 
   var db = database.Connect()
 
   // auth handler
-  r.Use(AuthHandler)
+  authGroup := r.Group("/auth")
+  authGroup.Use(AuthGroupHandler) 
 
-  r.GET("auth/sign-up", SignUp(db))
+  authGroup.POST("/sign-up", SignUp(db))
+  authGroup.POST("/login", Login(db))
 
   r.GET("/ping", DbConnection(db))
-  r.GET("/a", handler)
+
+  apiGroup := r.Group("/api")
+  apiGroup.Use(VerifyToken)
+  apiGroup.GET("/a", handler)
 
   // user query handler
 
   // food query handler
-  r.GET("/food", FoodQuery(db))
+  apiGroup.GET("/food", FoodQuery(db))
 
   // inventory query handler
 
@@ -45,28 +58,20 @@ func Start() {
 }
 
 func handler(ctx *gin.Context) {
-  data := ctx.Request.URL.Query()
-  log.Println(data.Get("value"))
-
   ctx.String(http.StatusOK, "handler")
 }
 
-func AuthHandler(ctx *gin.Context) {
+func AuthGroupHandler(ctx *gin.Context) {
   request := ctx.Request.URL.Path
   
-  if !strings.Contains(request, "auth") {
-    ctx.String(http.StatusUnauthorized, "Unauthorized")
-    ctx.Abort()
-  } else {
     switch request {
     case "/auth/sign-up":
       ctx.Next()
     case "/auth/login":
-      ctx.String(http.StatusOK, "login")
+      ctx.Next()
     default:
       ctx.String(http.StatusNotFound, "Not Found")
     }
-  }
 }
 
 func DbConnection(db *sql.DB) gin.HandlerFunc {
@@ -76,18 +81,71 @@ func DbConnection(db *sql.DB) gin.HandlerFunc {
   }
 }
 
+var secretKey = []byte("secret-key")
+
+// create JWT token
+func CreateToken(username string) (string, error) {
+  token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+    "username": username,
+    "exp": time.Now().Add(time.Hour * 24).Unix(),
+  })
+
+  tokenString, err := token.SignedString(secretKey)
+  if err != nil {
+    log.Println(err)
+    return "", err
+  }
+
+  return tokenString, nil
+}
+
+// verify JWT token 
+func VerifyToken(ctx *gin.Context) {
+  tokenString := ctx.GetHeader("Authorization")
+  tokenString = tokenString[len("Bearer "):]
+  token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+      return secretKey, nil
+   })
+  
+   if err != nil {
+      log.Println(err)
+   }
+  
+   if !token.Valid {
+     log.Println("invalid token")
+     ctx.AbortWithStatus(401)
+   } else {
+     ctx.Next()
+   }
+}
+
 // sign-up
 func SignUp(db *sql.DB) gin.HandlerFunc {
   return func(ctx *gin.Context) {
-    request := ctx.Request.Body
-    log.Println(request)
+    user := make(map[string]string)
+
+    user["username"], _ = ctx.GetPostForm("username")
+    user["firstName"], _ = ctx.GetPostForm("firstName")
+    user["lastName"], _ = ctx.GetPostForm("lastName")
+    user["email"], _ = ctx.GetPostForm("email")
+    user["password"], _ = ctx.GetPostForm("password")
+
+    res := auth.SignUp(db, user)
+    ctx.String(http.StatusOK, res)
   }
 }
 
 // login
 func Login(db *sql.DB) gin.HandlerFunc {
   return func(ctx *gin.Context) {
-    //
+    user := make(map[string]string)
+
+    user["id"], _ = ctx.GetPostForm("id")
+    user["password"], _ = ctx.GetPostForm("password")
+
+    res := auth.Login(db, user)
+    res["token"], _ = CreateToken(user["id"])
+    ctx.JSON(http.StatusOK, res)
   }
 }
 
