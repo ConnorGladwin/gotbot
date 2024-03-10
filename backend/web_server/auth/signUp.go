@@ -3,7 +3,6 @@ package auth
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/google/uuid"
@@ -15,8 +14,6 @@ func SignUp(db *sql.DB, user map[string]string) string {
 
     user["id"] = CreateUserId()
     user["hashedPassword"] = HashPassword(user["password"])
-
-    log.Println(user["hashedPassword"])
 
     query := fmt.Sprintf("insert into users (id, firstname, lastname, username, email, password) values ('%v', '%v', '%v', '%v', '%v', '%v')", user["id"], user["firstName"], user["lastName"], user["username"], user["email"], user["hashedPassword"])
 

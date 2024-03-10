@@ -13,7 +13,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
 
-	// "gotbot/backend/web_server/auth"
 	"gotbot/backend/web_server/auth"
 	"gotbot/backend/web_server/database"
 	"gotbot/backend/web_server/queries"
@@ -51,6 +50,9 @@ func Start() {
 
   // food query handler
   apiGroup.GET("/food", FoodQuery(db))
+  apiGroup.POST("/food", FoodQuery(db))
+  apiGroup.PATCH("/food", FoodQuery(db))
+  apiGroup.DELETE("/food", FoodQuery(db))
 
   // inventory query handler
 
@@ -81,7 +83,8 @@ func DbConnection(db *sql.DB) gin.HandlerFunc {
   }
 }
 
-var secretKey = []byte("secret-key")
+// create HMAC secret instance
+var secretKey = []byte("pleasehireme")
 
 // create JWT token
 func CreateToken(username string) (string, error) {
@@ -159,17 +162,32 @@ func UserQuery(db *sql.DB) gin.HandlerFunc {
 // food query function
 func FoodQuery(db *sql.DB) gin.HandlerFunc {
   return func(ctx *gin.Context) {
-    request := ctx.Request.URL.Query()
-    query := make(map[string]string)
+    var res any
+    requestMethod := ctx.Request.Method
+    query := make(map[string]any)
 
-    if request.Get("type") == "all" {
-      query["type"] = "all"
-    } else {
-      query["type"] = request.Get("type")
-      query["value"] = request.Get("value")
+    switch requestMethod {
+    case "GET":
+      request := ctx.Request.URL.Query()
+      if request.Get("type") == "all" {
+        query["type"] = "all"
+      } else {
+        query["type"] = request.Get("type")
+        query["id"] = request.Get("id")
+      }
+      res = queries.FoodQueries(db, requestMethod, query)
+    case "POST":
+      query["name"], _ = ctx.GetPostForm("name")
+      query["desc"], _ = ctx.GetPostForm("desc")
+      query["price"], _ = ctx.GetPostForm("price")
+
+      res = queries.FoodQueries(db, requestMethod, query)
+    case "PUT":
+      log.Println("put method")
+    case "DELETE":
+      log.Println("delete method")
     }
 
-    res := queries.FoodQueries(db, query)
     ctx.JSON(http.StatusOK, res)
   }
 }

@@ -2,43 +2,49 @@ package queries
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+
+	"github.com/google/uuid"
 )
 
 type FoodInterface struct {
   Id string
   Name string
   Desc string
-  Price string
+  Price int 
 }
 
-func FoodQueries(db *sql.DB, query map[string]string) any {
+func FoodQueries(db *sql.DB, method string, query map[string]any) any {
   var result any
-  log.Println(query)
 
-  switch query["type"] {
-  case "get":
-    result = "get"
-  case "update":
+  switch method {
+  case "GET":
+    if query["type"] == "all" {
+      result = GetAll(db)
+    } else {
+      result = GetById(db, query["id"].(string))
+    }
+  case "POST":
+    result = InsertNew(db, query)
+  case "PATCH":
     result = "update" 
-  case "delete":
+  case "DELETE":
     result = "delete"
-  default:
-    result = GetAll(db)
   }
 
   return result
 }
 
-func GetAll(db *sql.DB) map[int]FoodInterface {
+func GetAll(db *sql.DB) []FoodInterface {
   var (
     id string 
     name string 
     desc string
-    price string
+    price int 
   )
 
-  items :=  make(map[int]FoodInterface)
+  var items []FoodInterface
 
 	rows, err := db.Query("select * from food")
   if err != nil {
@@ -47,13 +53,11 @@ func GetAll(db *sql.DB) map[int]FoodInterface {
   defer rows.Close()
 
   for rows.Next() {
-    i := 0
 	  err := rows.Scan(&id, &name, &desc, &price)
 	  if err != nil {
 		  log.Fatal(err)
 	  }
-	  log.Println(id, name, desc, price)
-    items[i] = FoodInterface{id, name, desc, price}
+    items = append(items, FoodInterface{id, name, desc, price})
   }
   err = rows.Err()
 
@@ -62,4 +66,42 @@ func GetAll(db *sql.DB) map[int]FoodInterface {
   }
 
   return items
+}
+
+func GetById(db *sql.DB, id string) []FoodInterface {
+  var (
+    name string
+    desc string
+    price int
+  )
+
+  var item []FoodInterface
+  
+  query := fmt.Sprintf("select * from food where id = '%v'", id)
+  err := db.QueryRow(query).Scan(&id, &name, &desc, &price)
+  if err != nil {
+    log.Println(err)
+  }
+
+  item = append(item, FoodInterface{id, name, desc, price})
+
+  return item
+}
+
+func InsertNew(db *sql.DB, item map[string]any) map[string]any {
+  result := make(map[string]any)
+  item["id"] = uuid.New().String()
+
+  query := fmt.Sprintf("insert into food (id, name, description, price) values ('%v', '%v', '%v', %v)", item["id"], item["name"], item["desc"], item["price"])
+
+  _, err := db.Exec(query)
+    if err != nil {
+      result["status"] = false
+      result["message"] = err
+    } else {
+      result["status"] = true
+      result["message"] = "success"
+    }
+
+  return result
 }
