@@ -176,16 +176,17 @@ func FoodQuery(db *sql.DB) gin.HandlerFunc {
         query["id"] = request.Get("id")
       }
       res = queries.FoodQueries(db, requestMethod, query)
-    case "POST":
-      query["name"], _ = ctx.GetPostForm("name")
+    case "POST", "PATCH":
+      query["id"], _ = ctx.GetPostForm("id")
+			query["name"], _ = ctx.GetPostForm("name")
       query["desc"], _ = ctx.GetPostForm("desc")
       query["price"], _ = ctx.GetPostForm("price")
+			query["stock"], _ = ctx.GetPostForm("stock")
 
       res = queries.FoodQueries(db, requestMethod, query)
-    case "PUT":
-      log.Println("put method")
     case "DELETE":
-      log.Println("delete method")
+			query["id"], _ = ctx.GetPostForm("id")
+			res = queries.FoodQueries(db, requestMethod, query)
     }
 
     ctx.JSON(http.StatusOK, res)
