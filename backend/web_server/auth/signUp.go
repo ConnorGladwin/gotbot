@@ -9,8 +9,8 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-func SignUp(db *sql.DB, user map[string]string) string {
-    message := ""
+func SignUp(db *sql.DB, user map[string]string) map[string]string {
+    result := make(map[string]string)
 
     user["id"] = CreateUserId()
     user["hashedPassword"] = HashPassword(user["password"])
@@ -21,15 +21,16 @@ func SignUp(db *sql.DB, user map[string]string) string {
     if err != nil {
       insertError := fmt.Sprintf("%q", err)
       if strings.Contains(insertError, "users_username_key") {
-        message = "username exists"
+        result["message"] = "username exists"
       } else if strings.Contains(insertError, "users_email_key") {
-        message = "email exists"
+        result["message"] = "email exists"
       }
     } else {
-      message = "success"
+      result["message"] = "success"
+			result["id"] = user["id"]
     }
 
-    return message
+    return result 
  
 }
 

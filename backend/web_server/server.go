@@ -47,6 +47,9 @@ func Start() {
   apiGroup.GET("/a", handler)
 
   // user query handler
+	apiGroup.GET("user", UserQuery(db))
+	apiGroup.PATCH("user", UserQuery(db))
+	apiGroup.DELETE("user", UserQuery(db))
 
   // food query handler
   apiGroup.GET("/food", FoodQuery(db))
@@ -134,7 +137,7 @@ func SignUp(db *sql.DB) gin.HandlerFunc {
     user["password"], _ = ctx.GetPostForm("password")
 
     res := auth.SignUp(db, user)
-    ctx.String(http.StatusOK, res)
+    ctx.JSON(http.StatusOK, res)
   }
 }
 
@@ -155,7 +158,26 @@ func Login(db *sql.DB) gin.HandlerFunc {
 // user query function
 func UserQuery(db *sql.DB) gin.HandlerFunc {
   return func(ctx *gin.Context) {
-    //
+    var res any
+    requestMethod := ctx.Request.Method
+    query := make(map[string]string)
+		query["id"], _ = ctx.GetQuery("id")
+		query["username"], _ = ctx.GetQuery("username")
+		query["email"], _ = ctx.GetQuery("email")
+		query["password"], _ = ctx.GetQuery("password")
+
+		switch requestMethod {
+			case "GET":
+				res = queries.GetUser(db, query)
+			case "PATCH":
+				res = queries.UpdateUser(db, query)
+			case "DELETE":
+				res = queries.DeleteUser(db, query)
+			default:
+				res = http.StatusNotFound
+		}
+
+		ctx.JSON(http.StatusOK, res)
   }
 }
 
