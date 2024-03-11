@@ -47,9 +47,9 @@ func Start() {
   apiGroup.GET("/a", handler)
 
   // user query handler
-	apiGroup.GET("user", UserQuery(db))
-	apiGroup.PATCH("user", UserQuery(db))
-	apiGroup.DELETE("user", UserQuery(db))
+	apiGroup.GET("/user", UserQuery(db))
+	apiGroup.PATCH("/user", UserQuery(db))
+	apiGroup.DELETE("/user", UserQuery(db))
 
   // food query handler
   apiGroup.GET("/food", FoodQuery(db))
@@ -163,6 +163,8 @@ func UserQuery(db *sql.DB) gin.HandlerFunc {
     query := make(map[string]string)
 		query["id"], _ = ctx.GetQuery("id")
 		query["username"], _ = ctx.GetQuery("username")
+    query["firstName"], _ = ctx.GetQuery("firstName")
+    query["lastName"], _ = ctx.GetQuery("lastName")
 		query["email"], _ = ctx.GetQuery("email")
 		query["password"], _ = ctx.GetQuery("password")
 
@@ -173,6 +175,7 @@ func UserQuery(db *sql.DB) gin.HandlerFunc {
 				res = queries.UpdateUser(db, query)
 			case "DELETE":
 				res = queries.DeleteUser(db, query)
+        log.Println("res", res)
 			default:
 				res = http.StatusNotFound
 		}

@@ -96,7 +96,6 @@ func InsertNew(db *sql.DB, item map[string]any) map[string]any {
   item["id"] = uuid.New().String()
 
   query := fmt.Sprintf("insert into food (id, name, description, price, stock) values ('%v', '%v', '%v', %v, %v)", item["id"], item["name"], item["desc"], item["price"], item["stock"])
-	log.Println(query)
 
   _, err := db.Exec(query)
     if err != nil {
