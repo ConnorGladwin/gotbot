@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"strconv"
 	// "fmt"
 	"log"
 	"net/http"
@@ -58,8 +59,9 @@ func Start() {
   apiGroup.DELETE("/food", FoodQuery(db))
 
   // inventory query handler
+  apiGroup.GET("/inventory", InventoryQuery(db))
 
-  r.Run(":1234")
+  r.Run(":8080")
 }
 
 func handler(ctx *gin.Context) {
@@ -175,7 +177,6 @@ func UserQuery(db *sql.DB) gin.HandlerFunc {
 				res = queries.UpdateUser(db, query)
 			case "DELETE":
 				res = queries.DeleteUser(db, query)
-        log.Println("res", res)
 			default:
 				res = http.StatusNotFound
 		}
@@ -221,6 +222,12 @@ func FoodQuery(db *sql.DB) gin.HandlerFunc {
 // inventory
 func InventoryQuery(db *sql.DB) gin.HandlerFunc {
   return func(ctx *gin.Context) {
-    //
-  }
+    id, _ := ctx.GetQuery("id")
+    requestValue, _ := ctx.GetQuery("value")
+    value, _ := strconv.Atoi(requestValue)
+
+    res := queries.InventoryUpdate(db, id, value)
+
+    ctx.JSON(http.StatusOK, res)
+ }
 }
