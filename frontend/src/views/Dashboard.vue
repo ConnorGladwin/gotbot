@@ -6,7 +6,9 @@
         <div class="w-1/4">
           <Menu />
         </div>
-        <div class="w-3/4 border">content</div>
+        <div class="w-3/4 border">
+          <Content />
+        </div>
       </div>
     </div>
   </div>
@@ -15,4 +17,5 @@
 <script setup>
 import Header from "../components/auth/Header.vue";
 import Menu from "../components/dashboard/Menu.vue";
+import Content from "../components/dashboard/Content.vue";
 </script>
