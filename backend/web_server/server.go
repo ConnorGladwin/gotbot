@@ -3,10 +3,12 @@ package server
 import (
 	"database/sql"
 	"strconv"
+
 	// "fmt"
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"time"
@@ -31,8 +33,11 @@ func Start() {
   }
 
   r := gin.Default() 
+  r.Use(cors.Default())
 
   var db = database.Connect()
+  
+  r.GET("/auth/validate", ValidateRequest)
 
   // auth handler
   authGroup := r.Group("/auth")
@@ -45,7 +50,6 @@ func Start() {
 
   apiGroup := r.Group("/api")
   apiGroup.Use(VerifyToken)
-  apiGroup.GET("/a", handler)
 
   // user query handler
 	apiGroup.GET("/user", UserQuery(db))
@@ -127,6 +131,25 @@ func VerifyToken(ctx *gin.Context) {
    }
 }
 
+func ValidateRequest(ctx *gin.Context) {
+  tokenString, _ := ctx.GetQuery("token")
+  token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+      return secretKey, nil
+   })
+  
+   if err != nil {
+      log.Println(err)
+   }
+  
+   if !token.Valid {
+    log.Println("invalid token")
+    ctx.AbortWithStatus(500)
+   } else {
+    log.Println("token valid")
+    ctx.Status(http.StatusOK)
+   }
+}
+
 // sign-up
 func SignUp(db *sql.DB) gin.HandlerFunc {
   return func(ctx *gin.Context) {
@@ -139,6 +162,7 @@ func SignUp(db *sql.DB) gin.HandlerFunc {
     user["password"], _ = ctx.GetPostForm("password")
 
     res := auth.SignUp(db, user)
+    res["token"], _ = CreateToken(res["id"])
     ctx.JSON(http.StatusOK, res)
   }
 }

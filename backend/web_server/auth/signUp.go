@@ -22,8 +22,10 @@ func SignUp(db *sql.DB, user map[string]string) map[string]string {
       insertError := fmt.Sprintf("%q", err)
       if strings.Contains(insertError, "users_username_key") {
         result["message"] = "username exists"
+        result["id"] = "failed"
       } else if strings.Contains(insertError, "users_email_key") {
         result["message"] = "email exists"
+        result["id"] = "failed"
       }
     } else {
       result["message"] = "success"
