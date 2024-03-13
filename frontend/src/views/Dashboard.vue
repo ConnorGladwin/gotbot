@@ -6,7 +6,7 @@
         <div class="w-1/4">
           <Menu />
         </div>
-        <div class="w-3/4 border">
+        <div class="w-3/4">
           <Content />
         </div>
       </div>

@@ -33,7 +33,13 @@ func Start() {
   }
 
   r := gin.Default() 
-  r.Use(cors.Default())
+  r.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods: []string{"GET", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Authorization"},
+		MaxAge: 12 * time.Hour,
+	},
+))
 
   var db = database.Connect()
   
@@ -50,6 +56,7 @@ func Start() {
 
   apiGroup := r.Group("/api")
   apiGroup.Use(VerifyToken)
+	apiGroup.Use(cors.Default())
 
   // user query handler
 	apiGroup.GET("/user", UserQuery(db))
@@ -66,6 +73,22 @@ func Start() {
   apiGroup.GET("/inventory", InventoryQuery(db))
 
   r.Run(":8080")
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+        c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(204)
+            return
+        }
+
+        c.Next()
+    }
 }
 
 func handler(ctx *gin.Context) {
@@ -113,8 +136,9 @@ func CreateToken(username string) (string, error) {
 
 // verify JWT token 
 func VerifyToken(ctx *gin.Context) {
+	log.Println(ctx.GetHeader("Authorization"))
   tokenString := ctx.GetHeader("Authorization")
-  tokenString = tokenString[len("Bearer "):]
+  // tokenString = tokenString[len("Bearer "):]
   token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
       return secretKey, nil
    })
@@ -138,12 +162,13 @@ func ValidateRequest(ctx *gin.Context) {
    })
   
    if err != nil {
-      log.Println(err)
+      log.Println("token err", err)
+			ctx.AbortWithStatus(401)
    }
   
    if !token.Valid {
     log.Println("invalid token")
-    ctx.AbortWithStatus(500)
+    ctx.AbortWithStatus(401)
    } else {
     log.Println("token valid")
     ctx.Status(http.StatusOK)

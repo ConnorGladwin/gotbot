@@ -6,9 +6,24 @@
         >Inventory</span
       >
     </div>
+    <div class="flex flex-col items-center gap-4 mt-8">
+      <div v-for="item in list" :key="item" class="w-[80%]">
+        <ItemCard :item="item" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-//
+import { onMounted, ref } from "vue";
+import { inventory } from "../../util/queries/food.js";
+import ItemCard from "./ItemCard.vue";
+
+const list = ref();
+
+onMounted(async () => {
+  list.value = await inventory();
+
+  console.log(list.value);
+});
 </script>
