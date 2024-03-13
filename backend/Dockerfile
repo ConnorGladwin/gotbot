@@ -1,6 +1,6 @@
 FROM golang:1.22
 
-WORKDIR /app
+WORKDIR /backend
 
 COPY go.mod ./
 RUN go mod download
