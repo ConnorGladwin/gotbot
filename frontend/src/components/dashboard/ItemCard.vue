@@ -5,7 +5,7 @@
       <span class="font-secondary uppercase text-2xl">{{ item.Name }}</span>
     </div>
     <div class="border-l border-black pr-4"></div>
-    <div class="w-1/3 flex flex-col justify-center">
+    <div class="w-1/3 flex flex-col justify-center px-2">
       <span class="font-primary text-xl">Description</span>
       <span class="font-secondary uppercase text-2xl">{{ item.Desc }}</span>
     </div>

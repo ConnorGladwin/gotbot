@@ -1,14 +1,16 @@
 FROM node:lts-alpine
 
-WORKDIR /frontend
+RUN npm install -g http-server
 
-COPY package*.json
+WORKDIR /web
 
-RUN npm i
+COPY ./package*.json .
 
-COPY . .
+RUN npm install
+
+COPY ./ .
 
 RUN npm run build
 
 EXPOSE 5173
-CMD["dist"]
+CMD [ "http-server", "dist" ]

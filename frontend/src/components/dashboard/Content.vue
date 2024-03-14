@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="menuStore.getOption == 'dashboard'">
+    <div v-if="menuStore.getOption == 'dashboard'" class="w-full">
       <Inventory />
     </div>
     <div v-if="menuStore.getOption == 'add item'">

@@ -12,6 +12,7 @@
     "axios": "^1.6.7",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.29.5",
+    "http-server": "^14.1.1",
     "pinia": "^2.1.7",
     "postgres": "^3.4.3",
     "vue": "^3.4.19",

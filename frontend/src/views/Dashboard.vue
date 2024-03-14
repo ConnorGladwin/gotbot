@@ -2,11 +2,11 @@
   <div>
     <Header class="pt-[10%] pb-[5%]" />
     <div class="h-full flex flex-col justify-center items-center">
-      <div class="h-[500px] w-3/4 flex gap-6">
-        <div class="w-1/4">
+      <div class="h-[500px] w-[90%] flex gap-6">
+        <div class="w-[30%]">
           <Menu />
         </div>
-        <div class="w-3/4">
+        <div class="w-[80%]">
           <Content />
         </div>
       </div>
