@@ -1,20 +1,69 @@
 import axios from "axios";
 
 const url = import.meta.env.VITE_API_URL;
+const token = localStorage.getItem("token");
 
 export async function inventory() {
   const endpoint = `${url}/api/food?type=all`;
 
   const response = await fetch(endpoint, {
     method: "GET",
-    // Authorization:
-    //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTAyMzM2OTIsInVzZXJuYW1lIjoiY29ubm9yeW9ya2dsYWR3aW5AZ21haWwuY29tIn0.cPUpYrv4IzzQFOI28IpuyfryNVyl-8rd5QXIZr5ZJm4",
+    headers: {
+      Authorization: token,
+      "Content-Type": "text/plain",
+    },
+  })
+    .then((res) => {
+      return res.json();
+    })
+    .catch((err) => {
+      return err;
+    });
 
+  return response;
+}
+
+export async function updateInventory(id, value) {
+  const endpoint = `${url}/api/inventory?id=${id}&value=${value}`;
+
+  console.log(id, value);
+
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+    },
+    "Content-Type": "application/json",
+  })
+    .then((res) => {
+      return res.json();
+    })
+    .catch((err) => {
+      return err;
+    });
+
+  return response;
+}
+
+export async function addItem(item) {
+  const formData = new FormData();
+  const endpoint = `${url}/api/food`;
+
+  console.log(item);
+  formData.append("name", item.name);
+  formData.append("desc", item.desc);
+  formData.append("price", item.price);
+  formData.append("stock", item.stock);
+
+  const response = await fetch(endpoint, {
+    method: "POST",
     headers: {
       Authorization:
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTA0MTEzOTksInVzZXJuYW1lIjoia2hhc21vZGFuIn0.jP9zbmAo9JFa0is112bMiyz_l22QuC42TWuOISSOkEQ",
-      "Content-Type": "text/plain",
     },
+    "Content-Type": "application/x-www-form-urlencoded; boundary=&",
+
+    body: formData,
   })
     .then((res) => {
       return res.json();

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"strconv"
 
-	// "fmt"
 	"log"
 	"net/http"
 
@@ -80,7 +79,7 @@ func CORSMiddleware() gin.HandlerFunc {
         c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
         c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
         c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-        c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PATCH")
 
         if c.Request.Method == "OPTIONS" {
             c.AbortWithStatus(204)
@@ -252,11 +251,14 @@ func FoodQuery(db *sql.DB) gin.HandlerFunc {
       }
       res = queries.FoodQueries(db, requestMethod, query)
     case "POST", "PATCH":
-      query["id"], _ = ctx.GetPostForm("id")
-			query["name"], _ = ctx.GetPostForm("name")
+      query["id"] = ctx.PostForm("id")
+			query["name"] = ctx.PostForm("name")
       query["desc"], _ = ctx.GetPostForm("desc")
       query["price"], _ = ctx.GetPostForm("price")
 			query["stock"], _ = ctx.GetPostForm("stock")
+
+			log.Println(ctx.PostForm("name"))
+			log.Println(ctx.GetPostForm("name"))
 
       res = queries.FoodQueries(db, requestMethod, query)
     case "DELETE":
