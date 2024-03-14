@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="w-[1000px]">
     <div v-if="menuStore.getOption == 'dashboard'" class="w-full">
       <Inventory />
     </div>
     <div v-if="menuStore.getOption == 'add item'">
       <AddItem />
     </div>
-    <div v-if="menuStore.getOption == 'edit item'">
+    <div v-if="menuStore.getOption == 'edit item'" class="w-full">
       <EditItem />
     </div>
     <div v-if="menuStore.getOption == 'user'">

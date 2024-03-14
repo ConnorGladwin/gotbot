@@ -71,7 +71,7 @@ func Start() {
   // inventory query handler
   apiGroup.GET("/inventory", InventoryQuery(db))
 
-  r.Run(":8080")
+  r.Run(":3000")
 }
 
 func CORSMiddleware() gin.HandlerFunc {

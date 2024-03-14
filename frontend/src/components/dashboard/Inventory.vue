@@ -7,7 +7,7 @@
       >
     </div>
     <div
-      class="h-[500px] flex flex-col items-center gap-4 mt-8 overflow-y-scroll"
+      class="h-[500px] w-full flex flex-col items-center gap-4 mt-8 overflow-y-scroll"
     >
       <div v-for="item in list" :key="item" class="w-[80%]">
         <ItemCard :item="item" />

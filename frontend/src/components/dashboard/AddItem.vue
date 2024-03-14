@@ -13,7 +13,7 @@
           <input
             v-model="name"
             placeholder="Item name"
-            class="w-[90%] font-primary text-xl border border-gray-400 p-1 focus:outline-none focus:border-black"
+            class="w-[90%] font-primary text-xl border border-gray-400 p-2 focus:outline-none focus:border-black"
             :class="nameError ? 'border-red-500' : ''"
           />
           <span v-if="nameError == true" class="font-primary text-red-500 mt-2"
@@ -25,7 +25,7 @@
           <input
             v-model="desc"
             placeholder="Item description"
-            class="w-[90%] font-primary text-xl border border-gray-400 p-1 focus:outline-none focus:border-black"
+            class="w-[90%] font-primary text-xl border border-gray-400 p-2 focus:outline-none focus:border-black"
             :class="descError ? 'border-red-500' : ''"
           />
           <span v-if="descError == true" class="font-primary text-red-500 mt-2"
@@ -40,7 +40,7 @@
             v-model="price"
             placeholder="Item name"
             type="number"
-            class="w-[90%] font-primary text-xl border border-gray-400 p-1 focus:outline-none focus:border-black"
+            class="w-[90%] font-primary text-xl border border-gray-400 p-2 focus:outline-none focus:border-black"
             :class="priceError ? 'border-red-500' : ''"
           />
           <span v-if="priceError == true" class="font-primary text-red-500 mt-2"
@@ -53,7 +53,7 @@
             v-model="stock"
             placeholder="Item name"
             type="number"
-            class="w-[90%] font-primary text-xl border border-gray-400 p-1 focus:outline-none focus:border-black"
+            class="w-[90%] font-primary text-xl border border-gray-400 p-2 focus:outline-none focus:border-black"
             :class="stockError ? 'border-red-500' : ''"
           />
           <span v-if="stockError == true" class="font-primary text-red-500 mt-2"

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Header class="pt-[10%] pb-[5%]" />
+    <Header class="pt-[5%] pb-[5%]" />
     <div class="h-full flex flex-col justify-center items-center">
-      <div class="h-[500px] w-[90%] flex gap-6">
+      <div class="h-[500px] w-[90%] flex gap-3 pr-[100px]">
         <div class="w-[30%]">
           <Menu />
         </div>
