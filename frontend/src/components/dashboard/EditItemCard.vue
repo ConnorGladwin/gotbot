@@ -22,12 +22,19 @@
       >
         Edit
       </span>
+      <span
+        @click="deleteId()"
+        class="flex justify-center text-xl py-1 px-1 my-1 cursor-pointer hover:bg-black hover:text-white"
+      >
+        Delete
+      </span>
     </div>
   </div>
 </template>
 
 <script setup>
 import { useEditStore } from "../../store/editStore.js";
+import { deleteItem } from "../../util/queries/food.js";
 
 const editStore = useEditStore();
 const props = defineProps(["item"]);
@@ -35,5 +42,11 @@ const props = defineProps(["item"]);
 function editItem() {
   editStore.setItemId(props.item.Id);
   editStore.setPageState("item");
+}
+
+async function deleteId() {
+  await deleteItem(props.item.Id).then((res) => {
+    editStore.setPageState("");
+  });
 }
 </script>

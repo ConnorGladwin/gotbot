@@ -10,7 +10,7 @@
       v-if="editStore.getPageState == 'list'"
       class="h-[500px] flex flex-col items-center gap-4 mt-8 overflow-y-scroll"
     >
-      <div v-for="item in list" :key="item" class="w-[80%]">
+      <div v-for="item in list" :key="item" class="w-[80%] pb-2">
         <EditItemCard :item="item" />
       </div>
     </div>
@@ -48,6 +48,9 @@
           <div @click="submit()" class="flex justify-center">
             <Button text="Submit" :loading="loading" class="w-[80%]" />
           </div>
+          <div @click="editStore.stateReset()" class="flex justify-center">
+            <Button text="Cancel" :loading="loading" class="w-[80%]" />
+          </div>
         </div>
       </div>
     </div>
@@ -76,13 +79,17 @@ const priceError = ref(false);
 
 watch(editStore, async () => {
   if (editStore.pageState == "item") {
-    console.log(editStore.getItemId);
     await getById(editStore.getItemId).then((res) => {
       id.value = res.Id;
       name.value = res.Name;
       desc.value = res.Desc;
       price.value = res.Price;
     });
+  } else if (editStore.pageState == "") {
+    editStore.stateReset();
+    list.value = await inventory();
+  } else {
+    list.value = await inventory();
   }
 });
 

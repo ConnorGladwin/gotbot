@@ -1,13 +1,14 @@
-<template>
-  <div class="w-full">
-    <div class="w-full flex justify-center mt-4">
-      <span
-        class="w-1/2 flex justify-center font-secondary text-3xl border-b border-black pb-2"
-      >
-        Logout
-      </span>
-    </div>
-  </div>
-</template>
+<template></template>
 
-<script setup></script>
+<script setup>
+import { onBeforeMount } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+onBeforeMount(() => {
+  localStorage.removeItem("id");
+  localStorage.removeItem("token");
+  router.go();
+});
+</script>

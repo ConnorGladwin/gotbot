@@ -1,4 +1,6 @@
 const url = import.meta.env.VITE_API_URL;
+const token = localStorage.getItem("token");
+const userId = localStorage.getItem("id");
 
 export async function signUp(user) {
   const formData = new FormData();
@@ -68,13 +70,41 @@ export async function validateRoute(token) {
 }
 
 export async function getUser() {
-  //
+  const endpoint = `${url}/api/user?id=${userId}`;
+
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+      "Content-Type": "text/plain",
+    },
+  })
+    .then((res) => {
+      return res.json();
+    })
+    .catch((err) => {
+      return err;
+    });
+
+  return response[0];
 }
 
-export async function updateUser() {
-  //
-}
+export async function updateUser(user) {
+  const endpoint = `${url}/api/user?id=${userId}&firstName=${user.firstName}&lastName=${user.lastName}&username=${user.username}`;
 
-export async function deleteUser() {
-  //
+  const response = await fetch(endpoint, {
+    method: "PATCH",
+    headers: {
+      Authorization: token,
+    },
+    "Content-Type": "application/json",
+  })
+    .then((res) => {
+      return res.json();
+    })
+    .catch((err) => {
+      return err;
+    });
+
+  return response;
 }
